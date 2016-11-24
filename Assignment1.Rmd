@@ -1,0 +1,111 @@
+---
+output:
+  html_document: default
+  word_document: default
+---
+##Introduction
+
+
+This assignment uses data from the UC Irvine Machine Learning Repository, a popular repository for machine learning datasets. The overall goal is to examine how household energy usage varies over a 2-day period in February, 2007. The "Individual household electric power consumption Data Set" is used for this report. The url is given below.
+
+This report is about exploratory graphs, understanding the data, and developing strategies.The aim is to help establish patterns in data and understand its properties. They suggest modeling strategies and help to debug analyses.
+
+
+```{r, cache=TRUE}
+
+if(!file.exists('data.zip'))
+{
+ url <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+    
+ download.file(url, destfile = "data.zip")
+}
+unzip("data.zip")
+housePowerConsumption <-read.table("household_power_consumption.txt",header = TRUE, sep = ";", na.strings = "?")
+str(housePowerConsumption)
+
+```
+
+Removing the NA values and selecting the required data from the dates 2007-02-01 and 2007-02-02
+
+```{r}
+
+Data1 <- na.omit(housePowerConsumption)
+Data2 <- subset(Data1, Data1$Date == "1/2/2007" | Data1$Date == "2/2/2007" )
+str(Data2)
+
+```
+
+
+## Attach time to the date
+
+```{r}
+
+Data2$Date <- paste(Data2$Date, Data2$Time)
+class(Data2$Date)
+str(Data2$Date)
+
+```
+
+Convert Date to yyyy-mm-dd hh:mm:ss
+
+```{r}
+
+Data2$Date <- strptime(Data2$Date, "%d/%m/%Y %H:%M:%S")
+class(Data2$Date)
+str(Data2$Date)
+
+```
+
+
+
+##Plot 1
+
+```{r}
+
+hist(Data2$Global_active_power, main="Global Active Power", xlab="Global Active Power (kilowatts)", col="red")
+
+```
+
+
+##Plot 2
+
+```{r}
+
+plot(Data2$Date, Data2$Global_active_power,
+      type='l',ylab="Global Active Power (Kilowatts)", xlab="")
+
+```
+
+
+## Plot 3
+
+```{r}
+
+plot(Data2$Date, Data2$Sub_metering_1,type='l', ylab ="Energy sub metering", xlab="")
+lines(Data2$Date, Data2$Sub_metering_2, type='l', col='red')
+lines(Data2$Date, Data2$Sub_metering_3, type='l', col="blue")
+legend('topright', c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),
+lty = c(1,1,1), col = c("black","red","blue"))
+
+```
+
+## Plot 4
+
+```{r}
+
+par(mfcol=c(2,2))
+plot(Data2$Date, Data2$Global_active_power, type='l', ylab = "Global Active Power", xlab = "")
+plot(Data2$Date, Data2$Sub_metering_1, type = 'l', xlab = "", ylab = "Energy sub metering")
+lines(Data2$Date, Data2$Sub_metering_2, type = 'l', col = 'red')
+lines(Data2$Date, Data2$Sub_metering_3, type = 'l', col = "blue")
+legend('topright', c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lty = c(1,1,1), col = c("black","red","blue"))
+plot(Data2$Date, Data2$Voltage, type = 'l', ylab = "Voltage", xlab = "datetime" )
+plot(Data2$Date, Data2$Global_reactive_power, type = 'l', ylab = "Global_reactive_power", xlab = "datetime" )
+
+```
+
+
+
+
+
+
